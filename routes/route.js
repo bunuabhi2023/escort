@@ -7,6 +7,8 @@ const advertisementController = require('../controllers/advertisementController'
 const escortController =  require('../controllers/escortController');
 const serviceController = require('../controllers/serviceController');
 const ratingController = require('../controllers/ratingController');
+const commissionController = require('../controllers/commissionController');
+
 
 
 const {auth, isAdmin, isVendor}  = require('../middlewares/Auth');
@@ -74,5 +76,10 @@ router.delete('/delete-service/:id', auth, serviceController.deleteService);
 router.post("/create-rating", customerAuth, ratingController.creatRating);
 router.put('/update-rating/:id', customerAuth,  ratingController.updateRating);
 router.get("/get-rating/:id",  ratingController.getEscortRating);
+
+//Commission Route//
+router.post("/set-commission", auth, isAdmin, commissionController.setCommission);
+router.get('/get-all-commission', auth, isAdmin, commissionController.getAllCommission);
+router.get("/get-commission-by-vendor/:id", auth, isAdmin,  commissionController.getCommissionByVendor);
 
 module.exports = router;
