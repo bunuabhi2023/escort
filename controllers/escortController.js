@@ -1,4 +1,5 @@
 const Escort = require('../models/escort');
+const Rating = require('../models/rating');
 const User =require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -101,9 +102,20 @@ const getAllEscorts = async (req, res) => {
       }
   
       // Query escorts using the specified filters
-      const escorts = await Escort.find(filters).select('-password').populate('serviceIds', 'name');
+      const escorts = await Escort.find(filters).select('-password').populate('serviceIds', 'name').lean(); // Convert the result to plain JavaScript objects
+
+      // Fetch and attach ratings for each escort
+      const escortsWithRatings = await Promise.all(
+        escorts.map(async (escort) => {
+          const ratings = await Rating.find({ escortId: escort._id }).populate('customerId', 'name');
+          return {
+            ...escort,
+            ratings,
+          };
+        })
+      );
   
-      return res.status(200).json(escorts);
+      return res.status(200).json(escortsWithRatings);
     } catch (error) {
       console.error('Error while fetching escorts:', error);
       return res.status(500).json({ message: 'Something went wrong' });
