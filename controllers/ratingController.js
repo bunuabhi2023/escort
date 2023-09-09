@@ -50,7 +50,7 @@ exports.updateRating = async(req, res) =>{
 exports.getEscortRating = async(req, res) =>{
     try {
         const escortId = req.params.id;
-        const ratings = await Rating.findById(escortId).populate('customerId', 'name').populate('escortId', 'name').exec();
+        const ratings = await Rating.find({escortId:escortId}).populate('customerId', 'name').populate('escortId', 'name').exec();
 
         if(!ratings){
             return null;
