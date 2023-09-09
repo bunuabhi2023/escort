@@ -34,7 +34,7 @@ router.post("/change-password", auth, userController.updatePassword);
 router.post("/register-customer", customerController.signup);
 router.post("/login-customer", customerController.login);
 router.get("/get-my-profile", customerAuth, customerController.getMyProfile);
-router.put("/update-my-profile/:id", customerAuth, customerController.updateMyProfile);
+router.put("/update-my-profile", imageSingleUpload, customerAuth, customerController.updateMyProfile);
 router.get("/get-customer",  auth, isAdmin, customerController.getAllCustomers);
 router.get('/get-customer-by-id/:id', auth, isAdmin, customerController.getCustomerById);
 router.get("/get-my-favorite",  customerAuth, customerController.getMyFavorite);
@@ -47,8 +47,8 @@ router.get('/get-recent-view', customerAuth, customerController.getMyRecentView)
 
 
 //Advertisement  Route//
-router.post("/create-advertisement", auth, isAdmin,advertisementController.createAdvertisement);
-router.put("/update-advertisement/:id", auth, isAdmin, advertisementController.updateAdvertisement);
+router.post("/create-advertisement",imageSingleUpload, auth, isAdmin,advertisementController.createAdvertisement);
+router.put("/update-advertisement/:id",imageSingleUpload, auth, isAdmin, advertisementController.updateAdvertisement);
 router.put("/update-advertisement-status/:id", auth, isAdmin, advertisementController.changeStatus);
 router.get("/get-advertisement",  advertisementController.getAllAdvertisement);
 router.get("/get-advertisement-by-id/:id",  advertisementController.getAdvertisementById);
@@ -57,6 +57,7 @@ router.delete('/delete-advertisement/:id', auth, isAdmin, advertisementControlle
 //Escort Route//
 router.post("/create-escort", imageMultiUpload, auth, isVendor, escortController.createEscort);
 router.get("/get-escorts",  escortController.getAllEscorts);
+router.get("/get-escort-by-id/:id",  escortController.getEscortById);
 router.get("/get-my-escorts",  auth, isVendor, escortController.getMyEscorts);
 router.put("/update-escorts/:id",  imageMultiUpload, auth,  escortController.updateEscort);
 router.delete("/delete-escort/:id",  auth, isVendor, escortController.deleteEscorts);

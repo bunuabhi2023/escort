@@ -159,7 +159,22 @@ const getAllEscorts = async (req, res) => {
     }
   };
 
-  
+const getEscortById = async(req, res) =>{
+  try {
+    const escort = await Escort.findById(req.params.id).populate('vendorId', 'name');
+    if(!escort){
+      
+      return res.status(404).json({ message: 'Not Found' });
+    }
+
+    const ratings = await Rating.find({escortId:escort._id}).populate('customerId', 'name');
+    
+    return res.status(200).json({escort, ratings});
+  } catch (error) {
+    
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+}  
 
   const updateEscort = async (req, res) => {
     const escortId = req.params.id;
@@ -250,5 +265,6 @@ module.exports = {
     getAllEscorts,
     getMyEscorts,
     updateEscort,
-    deleteEscorts
+    deleteEscorts,
+    getEscortById
 }

@@ -1,41 +1,9 @@
 const Advertisement = require('../models/advertisement');
-const multer = require('multer');
-
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, './uploads/'); // Set the destination folder for uploaded images
-    },
-    filename: function (req, file, cb) {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      cb(null, uniqueSuffix + '-' + file.originalname); // Set the filename for the uploaded image
-    },
-  });
-  
-//   const fileFilter = (req, file, cb) => {
-//     // Check file type to allow only images
-//     if (file.mimetype.startsWith('image/')) {
-//       cb(null, true);
-//     } else {
-//       cb(new Error('Only images are allowed.'), false);
-//     }
-//   };
-  
-  const upload = multer({
-    storage: storage,
-  }).single('file'); // Specify that this is a single file upload
-
 
 const createAdvertisement = async (req, res) => {
-  upload(req, res, async (err) => {
-    if (err instanceof multer.MulterError) {
-      return res.status(400).json({ error: 'Error uploading image' });
-    } else if (err) {
-      return res.status(500).json({ error: 'Server error' });
-    }
     const { title} = req.body;
     const createdBy = req.user.id;
-    const file = req.file ? req.file.filename : undefined;
+    const file = req.s3FileUrl;
 
     newAdvertisement = new Advertisement({
     title,
@@ -51,24 +19,28 @@ const createAdvertisement = async (req, res) => {
       console.error(error); // Add this line for debug logging
       return res.status(500).json({ error: 'Failed to create Advertisement' });
     }
-  });
 };
 
 const updateAdvertisement = async (req, res) => {
-    
-  upload(req, res, async (err) => {
-    if (err instanceof multer.MulterError) {
-      return res.status(400).json({ error: 'Error uploading image' });
-    } else if (err) {
-      return res.status(500).json({ error: 'Server error' });
-    }
+  
     const { title} = req.body;
     const updatedBy = req.user.id;
-    let updateFields = {
-      title,
-      updatedBy,
-      updatedAt: Date.now(),
-    };
+    let updateFields = null
+    if(req.body.file && file.length>0){
+      const file = req.s3FileUrl;
+      updateFields = {
+        title,
+        file,
+        updatedBy,
+        updatedAt: Date.now(),
+      };
+    }else{
+      updateFields = {
+        title,
+        updatedBy,
+        updatedAt: Date.now(),
+      };
+    }
 
 
     try {
@@ -89,7 +61,6 @@ const updateAdvertisement = async (req, res) => {
       console.error(error); // Add this line for debug logging
       return res.status(500).json({ error: 'Failed to update Advertisement' });
     }
-  });
 };
 
 // Function to get all Advertisement
@@ -100,11 +71,7 @@ const getAllAdvertisement = async (req, res)  => {
       .populate('updatedBy', 'name')
       .exec();
       
-      const advertisementWithUrls = advertisements.map((advertisement) => {
-        const imageUrl = advertisement.file ? `${req.protocol}://${req.get('host')}/uploads/${advertisement.file}` : null;
-        return { ...advertisement._doc, imageUrl };
-        });
-        res.json(advertisementWithUrls);
+        res.json(advertisements);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Failed to fetch discounts' });
@@ -125,10 +92,8 @@ const getAdvertisementById = async (req, res) => {
       console.log(`Advertisement with ID ${req.params.id} not found`);
       return res.status(404).json({ error: 'Advertisement  not found' });
     }
-    const imageUrl = advertisement.file ? `${req.protocol}://${req.get('host')}/uploads/${advertisement.file}` : null;
-    const advertisementWithUrls = { ...advertisement._doc, imageUrl };
-
-    res.json(advertisementWithUrls);
+    
+    res.json(advertisement);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Failed to fetch discount' });

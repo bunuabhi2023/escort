@@ -147,12 +147,9 @@ exports.getMyProfile = async (req, res) => {
 };
 
 exports.updateMyProfile = async(req, res) =>{
-        upload(req, res, async (err) => {
-        if (err instanceof multer.MulterError) {
-          return res.status(400).json({ error: 'Error uploading image' });
-        } else if (err) {
-          return res.status(500).json({ error: 'Server error' });
-        }
+        const authenticatedUser = req.customer;
+        
+        const customerId = authenticatedUser._id;
     
         const { name, email, mobile, dob, username } = req.body;
         const updatedBy = req.customer.id;
@@ -160,7 +157,7 @@ exports.updateMyProfile = async(req, res) =>{
         const file = req.s3FileUrl;
     
         try {
-          const existingCustomer = await Customer.findById(req.params.id);
+          const existingCustomer = await Customer.findById(customerId);
     
           if (!existingCustomer) {
             return res.status(404).json({ error: 'Customer not found' });
@@ -193,7 +190,7 @@ exports.updateMyProfile = async(req, res) =>{
           }
     
           const updatedCustomer = await Customer.findByIdAndUpdate(
-            req.params.id,
+            customerId,
             { name, email, mobile, dob, age, username, file, updatedBy, updatedAt: Date.now() },
             { new: true }
           );
@@ -204,8 +201,8 @@ exports.updateMyProfile = async(req, res) =>{
           console.error(error); // Add this line for debug logging
           return res.status(500).json({ error: 'Failed to update Customer' });
         }
-      });
-}
+      
+};
 
 
 exports.getAllCustomers = async (req, res)  => {
