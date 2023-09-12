@@ -136,6 +136,10 @@ const escorts = new mongoose.Schema(
             required:false,
             maxLength:800,
         },
+        bookedCount: {
+            type:Number,
+            required:false,
+        },
         createdAt:{
             type:Date,
             required:true,
