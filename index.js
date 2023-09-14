@@ -3,6 +3,9 @@ const app = express();
 const cookieParser = require('cookie-parser');
 const sls = require("serverless-http");
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./config/swagger-config'); // Path to your swaggerConfig.js file
+
 const cors = require('cors');
 app.use('/uploads', express.static('uploads'));
 app.use(
@@ -36,6 +39,7 @@ app.listen(PORT, () =>{
     console.log(`Server started Successfully at ${PORT}`);
 })
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 //connect to the database
 const dbConnect = require("./config/database");
 dbConnect();

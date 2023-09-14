@@ -1,0 +1,1413 @@
+swagger: "2.0"
+info:
+  title: Escorts API
+  description: Rest APIs For Escort App
+  version: 1.0
+basePath: /api
+schemes:
+  - https
+paths:
+  /register-user:
+    post:
+      summary: Register a new user
+      tags:
+        - User
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              email:
+                type: string
+              mobile:
+                type: string
+              password:
+                type: string
+            example:
+              name: John Doe
+              email: john@example.com
+              mobile: +1234567890
+              password: secret
+      responses:
+        201:
+          description: User created successfully
+        400:
+          description: Email or mobile already exists
+        500:
+          description: Something went wrong
+
+  /login-user:
+    post:
+      summary: Log in a user
+      tags:
+        - User
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+            example:
+              email: john@example.com
+              password: secret
+      responses:
+        200:
+          description: User logged in successfully
+        400:
+          description: Please fill all the details carefully
+        401:
+          description: User is not registered
+        403:
+          description: Password Incorrect
+        500:
+          description: Login Failure
+
+  /my-profile:
+    get:
+      summary: Get the user's own profile
+      tags:
+        - User
+      security:
+        - BearerAuth: []
+      produces:
+        - application/json
+      responses:
+        200:
+          description: User profile retrieved successfully
+        404:
+          description: User not found
+        500:
+          description: Something went wrong
+
+  /update-user/{id}:
+    put:
+      summary: Update user profile by ID
+      tags:
+        - User
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              email:
+                type: string
+              mobile:
+                type: string
+              dob:
+                type: string
+              city:
+                type: string
+              state:
+                type: string
+              pincode:
+                type: string
+              address:
+                type: string
+              status:
+                type: string
+            example:
+              name: Updated Name
+              email: updated@example.com
+              mobile: +9876543210
+              dob: 1990-01-01
+              city: New City
+              state: New State
+              pincode: 12345
+              address: Updated Address
+              status: active
+      responses:
+        200:
+          description: User profile updated successfully
+        400:
+          description: Email or mobile already exists for another user
+        404:
+          description: User not found
+        500:
+          description: Failed to update User
+
+  /delete-user/{id}:
+    delete:
+      summary: Delete a user by ID
+      tags:
+        - User
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: User deleted successfully
+        404:
+          description: User not found
+        500:
+          description: Failed to delete User
+
+  /update-user-status:
+    put:
+      summary: Update user status
+      tags:
+        - User
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              userId:
+                type: string
+              status:
+                type: string
+            example:
+              userId: 1234567890
+              status: active
+      responses:
+        200:
+          description: User Status Updated successfully
+        404:
+          description: User not found
+        500:
+          description: Failed to Update Status
+
+  /forgot-password:
+    post:
+      summary: Request password reset
+      tags:
+        - User
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              newPassword:
+                type: string
+              confirmPassword:
+                type: string
+            example:
+              email: john@example.com
+              newPassword: newsecret
+              confirmPassword: newsecret
+      responses:
+        200:
+          description: Password Reset Successfully
+        400:
+          description: New Password and Confirm Password do not match
+        404:
+          description: User not found
+        500:
+          description: Something went wrong
+
+  /change-password:
+    post:
+      summary: Change user password
+      tags:
+        - User
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              oldPassword:
+                type: string
+              newPassword:
+                type: string
+              confirmPassword:
+                type: string
+            example:
+              oldPassword: secret
+              newPassword: newsecret
+              confirmPassword: newsecret
+      responses:
+        200:
+          description: Password updated successfully
+        400:
+          description: Passwords do not match or Incorrect old password
+        404:
+          description: User not found
+        500:
+          description: Something went wrong
+
+  /register-customer:
+    post:
+      summary: Register a new customer
+      tags:
+        - Customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                mobile:
+                  type: string
+                password:
+                  type: string
+                username:
+                  type: string
+              required:
+                - name
+                - email
+                - mobile
+                - password
+                - username
+      responses:
+        '201':
+          description: Customer created successfully
+        '400':
+          description: Email or mobile or Username already exists
+        '500':
+          description: Something went wrong
+  /login-customer:
+    post:
+      summary: Login as a customer
+      tags:
+        - Customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Customer logged in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  token:
+                    type: string
+                  customer:
+                    type: object
+                  message:
+                    type: string
+        '401':
+          description: Customer is not registered
+        '403':
+          description: Password Incorrect
+        '500':
+          description: Login Failure
+  /get-my-profile:
+    get:
+      summary: Get the profile of the authenticated customer
+      tags:
+        - Customer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customer:
+                    type: object
+        '404':
+          description: Customer not found
+        '500':
+          description: Something went wrong
+  /update-my-profile:
+    put:
+      summary: Update the profile of the authenticated customer
+      tags:
+        - Customer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                mobile:
+                  type: string
+                dob:
+                  type: string
+                username:
+                  type: string
+                file:
+                  type: string
+      responses:
+        '200':
+          description: Customer profile updated successfully
+        '400':
+          description: Email or mobile already exists for another customer
+        '404':
+          description: Customer not found
+        '500':
+          description: Failed to update Customer
+  /get-customer:
+    get:
+      summary: Get a list of all customers (admin only)
+      tags:
+        - Customer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    customer:
+                      type: object
+        '500':
+          description: Failed to fetch customers
+  /get-customer-by-id/{id}:
+    get:
+      summary: Get a customer by ID (admin only)
+      tags:
+        - Customer
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Customer not found
+        '500':
+          description: Failed to fetch customer
+  /get-my-favorite:
+    get:
+      summary: Get the favorite escorts of the authenticated customer
+      tags:
+        - Customer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  wishlistDetails:
+                    type: array
+                    items:
+                      type: object
+        '500':
+          description: Something went wrong
+  /add-to-favorite:
+    post:
+      summary: Add an escort to the favorite list of the authenticated customer
+      tags:
+        - Customer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                escortId:
+                  type: string
+      responses:
+        '200':
+          description: Added to favorites successfully
+        '404':
+          description: Customer not found
+        '500':
+          description: An error occurred
+  /remove-from-favorite:
+    post:
+      summary: Remove an escort from the favorite list of the authenticated customer
+      tags:
+        - Customer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                escortId:
+                  type: string
+      responses:
+        '200':
+          description: Removed from favorites successfully
+        '404':
+          description: Not found in favorites
+        '500':
+          description: An error occurred
+  /update-customer/{id}:
+    post:
+      summary: Update customer information (admin only)
+      tags:
+        - Customer
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                mobile:
+                  type: string
+                dob:
+                  type: string
+                username:
+                  type: string
+                file:
+                  type: string
+      responses:
+        '200':
+          description: Customer information updated successfully
+        '400':
+          description: Email or mobile already exists for another customer
+        '404':
+          description: Customer not found
+        '500':
+          description: Failed to update Customer
+  /update-recent-view/{id}:
+    put:
+      summary: Update the recently viewed escorts list for the authenticated customer
+      tags:
+        - Customer
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Done
+        '404':
+          description: Customer not found
+        '500':
+          description: An error occurred
+  /get-recent-view:
+    get:
+      summary: Get the recently viewed escorts of the authenticated customer
+      tags:
+        - Customer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  wishlistDetails:
+                    type: array
+                    items:
+                      type: object
+        '500':
+          description: Something went wrong
+
+  /create-escort:
+    post:
+      summary: Create a new escort
+      tags:
+        - Escort
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                mobile:
+                  type: string
+                dob:
+                  type: string
+                bio:
+                  type: string
+                price:
+                  type: number
+                city:
+                  type: string
+                state:
+                  type: string
+                pincode:
+                  type: string
+                address:
+                  type: string
+                services:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - name
+                - email
+                - password
+                - mobile
+                - dob
+                - bio
+                - price
+                - city
+                - state
+                - pincode
+                - address
+                - services
+      responses:
+        '201':
+          description: Escort created successfully
+        '400':
+          description: Email or mobile already exists
+        '500':
+          description: Something went wrong
+  /get-escorts:
+    get:
+      summary: Get a list of all escorts
+      tags:
+        - Escort
+      parameters:
+        - in: query
+          name: city
+          schema:
+            type: string
+          description: Filter by city
+        - in: query
+          name: state
+          schema:
+            type: string
+          description: Filter by state
+        - in: query
+          name: age
+          schema:
+            type: integer
+          description: Filter by age
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: Filter by name
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    escort:
+                      type: object
+                    ratings:
+                      type: array
+                      items:
+                        type: object
+        '500':
+          description: Something went wrong
+  /get-escort-by-id/{id}:
+    get:
+      summary: Get an escort by ID
+      tags:
+        - Escort
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Not Found
+        '500':
+          description: Something went wrong
+  /get-my-escorts:
+    get:
+      summary: Get escorts created by the authenticated user
+      tags:
+        - Escort
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: city
+          schema:
+            type: string
+          description: Filter by city
+        - in: query
+          name: state
+          schema:
+            type: string
+          description: Filter by state
+        - in: query
+          name: age
+          schema:
+            type: integer
+          description: Filter by age
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: Filter by name
+      responses:
+        '200':
+          description: Successful response
+        '500':
+          description: Something went wrong
+  /update-escorts/{id}:
+    put:
+      summary: Update escort information
+      tags:
+        - Escort
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                mobile:
+                  type: string
+                dob:
+                  type: string
+                bio:
+                  type: string
+                price:
+                  type: number
+                city:
+                  type: string
+                state:
+                  type: string
+                pincode:
+                  type: string
+                address:
+                  type: string
+                services:
+                  type: array
+                  items:
+                    type: string
+                removeFiles:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - name
+                - email
+                - mobile
+                - dob
+                - bio
+                - price
+                - city
+                - state
+                - pincode
+                - address
+                - services
+      responses:
+        '200':
+          description: Escort updated successfully
+        '404':
+          description: Escort not found
+        '500':
+          description: Something went wrong
+  /delete-escort/{id}:
+    delete:
+      summary: Delete an escort
+      tags:
+        - Escort
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Escort Deleted Successfully
+        '404':
+          description: Escort not found
+        '500':
+          description: Something went wrong
+
+  /create-service:
+    post:
+      summary: Create a new service
+      tags:
+        - Service
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+      responses:
+        '200':
+          description: Service created successfully
+        '500':
+          description: Something went wrong
+  /update-service/{id}:
+    put:
+      summary: Update a service by ID
+      tags:
+        - Service
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+      responses:
+        '200':
+          description: Service updated successfully
+        '404':
+          description: Service not found
+        '500':
+          description: Something went wrong
+  /get-service:
+    get:
+      summary: Get all services
+      tags:
+        - Service
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    name:
+                      type: string
+                    createdBy:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        name:
+                          type: string
+                    updatedBy:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        name:
+                          type: string
+        '500':
+          description: Something went wrong
+  /get-service-by-id/{id}:
+    get:
+      summary: Get a service by ID
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  name:
+                    type: string
+                  createdBy:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      name:
+                        type: string
+                  updatedBy:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      name:
+                        type: string
+        '404':
+          description: Service not found
+        '500':
+          description: Something went wrong
+  /delete-service/{id}:
+    delete:
+      summary: Delete a service by ID
+      tags:
+        - Service
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Service deleted successfully
+        '404':
+          description: Service not found
+        '500':
+          description: Something went wrong
+
+  /create-advertisement:
+    post:
+      summary: Create a new advertisement
+      tags:
+        - Advertisement
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                file:
+                  type: string
+              required:
+                - title
+                - file
+      responses:
+        '200':
+          description: Advertisement created successfully
+        '500':
+          description: Something went wrong
+  /update-advertisement/{id}:
+    put:
+      summary: Update an advertisement by ID
+      tags:
+        - Advertisement
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                file:
+                  type: string
+              required:
+                - title
+                - file
+      responses:
+        '200':
+          description: Advertisement updated successfully
+        '404':
+          description: Advertisement not found
+        '500':
+          description: Something went wrong
+  /update-advertisement-status/{id}:
+    put:
+      summary: Update the status of an advertisement by ID
+      tags:
+        - Advertisement
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+              required:
+                - status
+      responses:
+        '200':
+          description: Advertisement status changed successfully
+        '404':
+          description: Advertisement not found
+        '500':
+          description: Something went wrong
+  /get-advertisement:
+    get:
+      summary: Get all advertisements
+      tags:
+        - Advertisement
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    title:
+                      type: string
+                    createdBy:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        name:
+                          type: string
+                    updatedBy:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        name:
+                          type: string
+                    file:
+                      type: string
+        '500':
+          description: Something went wrong
+  /get-advertisement-by-id/{id}:
+    get:
+      summary: Get an advertisement by ID
+      tags:
+        - Advertisement
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  title:
+                    type: string
+                  createdBy:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      name:
+                        type: string
+                  updatedBy:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      name:
+                        type: string
+                  file:
+                    type: string
+        '404':
+          description: Advertisement not found
+        '500':
+          description: Something went wrong
+  /delete-advertisement/{id}:
+    delete:
+      summary: Delete an advertisement by ID
+      tags:
+        - Advertisement
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Advertisement deleted successfully
+        '404':
+          description: Advertisement not found
+        '500':
+          description: Something went wrong
+
+  /set-commission:
+    post:
+      summary: Set or update commission for a vendor
+      tags:
+        - Commission
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vendorId:
+                  type: string
+                commissionPercentage:
+                  type: number
+              required:
+                - vendorId
+                - commissionPercentage
+      responses:
+        '200':
+          description: Commission set or updated successfully
+        '400':
+          description: Commission already exists for this vendor, and it was updated
+        '500':
+          description: Something went wrong
+  /get-all-commission:
+    get:
+      summary: Get all commissions
+      tags:
+        - Commission
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    vendorId:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        name:
+                          type: string
+                    commissionPercentage:
+                      type: number
+        '500':
+          description: Something went wrong
+  /get-commission-by-vendor/{id}:
+    get:
+      summary: Get commission for a vendor by vendor ID
+      tags:
+        - Commission
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  vendorId:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      name:
+                        type: string
+                  commissionPercentage:
+                    type: number
+        '500':
+          description: Something went wrong
+
+  /create-rating:
+    post:
+      summary: Create a new rating for an escort
+      tags:
+        - Rating
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                escortId:
+                  type: string
+                rating:
+                  type: number
+                comment:
+                  type: string
+              required:
+                - escortId
+                - rating
+                - comment
+      responses:
+        '201':
+          description: Rating created successfully
+        '500':
+          description: Something went wrong
+  /update-rating/{id}:
+    put:
+      summary: Update an existing rating for an escort
+      tags:
+        - Rating
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                escortId:
+                  type: string
+                rating:
+                  type: number
+                comment:
+                  type: string
+              required:
+                - escortId
+                - rating
+                - comment
+      responses:
+        '201':
+          description: Rating updated successfully
+        '404':
+          description: Rating not found
+        '500':
+          description: Something went wrong
+  /get-rating/{id}:
+    get:
+      summary: Get ratings for a specific escort by escort ID
+      tags:
+        - Rating
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    customerId:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        name:
+                          type: string
+                    escortId:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        name:
+                          type: string
+                    rating:
+                      type: number
+                    comment:
+                      type: string
+        '500':
+          description: Something went wrong
+
+
+securityDefinitions:
+  BearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
