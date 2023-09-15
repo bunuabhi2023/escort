@@ -40,6 +40,16 @@ const users = new mongoose.Schema(
             type:Number,
             required:false,
         },
+        bio: {
+            type:String,
+            required:false,
+            maxLength:500,
+        },
+        price: {
+            type:String,
+            required:false,
+            maxLength:50,
+        },
         // latitude: {
         //     type:String,
         //     required:false,
@@ -81,7 +91,7 @@ const users = new mongoose.Schema(
             enum:["inactive", "active", "rejected"],
             default:"inactive"
         },
-        file:{
+        files:[{
             Bucket:{
                 type:String,
                 required:false,
@@ -97,11 +107,11 @@ const users = new mongoose.Schema(
                 required:false,
                 maxLength:255,
             }
-        },
+        }],
         role:{
             type:String,
-            enum:["Admin", "Vendor"],
-            default:"Vendor"
+            enum:["Admin", "Escort"],
+            default:"Escort"
         },
         city:{
             type:String,
@@ -123,10 +133,19 @@ const users = new mongoose.Schema(
             required:false,
             maxLength:255,
         },
+        serviceIds:[{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Service',
+            required:false,
+        }],
         deviceId:{
             type:String,
             required:false,
             maxLength:800,
+        },
+        bookedCount: {
+            type:Number,
+            required:false,
         },
         createdAt:{
             type:Date,

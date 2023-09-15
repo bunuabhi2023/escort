@@ -489,10 +489,10 @@ paths:
           schema:
             type: object
             properties:
-              escortId:
+              userId:
                 type: string
             example:
-              escortId: 1234567890
+              usertId: 1234567890
       responses:
         200:
           description: Added to favorites successfully
@@ -519,10 +519,10 @@ paths:
           schema:
             type: object
             properties:
-              escortId:
+              usertId:
                 type: string
             example:
-              escortId: 1234567890
+              usertId: 1234567890
       responses:
         200:
           description: Removed from favorites successfully
@@ -617,250 +617,6 @@ paths:
           description: Customer not found
         500:
           description: Failed to fetch recently viewed escorts
-
-  /create-escort:
-    post:
-      summary: Create a new escort
-      tags:
-        - Escort
-      security:
-        - BearerAuth: []
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-              email:
-                type: string
-              password:
-                type: string
-              mobile:
-                type: string
-              dob:
-                type: string
-              bio:
-                type: string
-              price:
-                type: number
-              city:
-                type: string
-              state:
-                type: string
-              pincode:
-                type: string
-              address:
-                type: string
-              services:
-                type: array
-                items:
-                  type: string
-              files:
-                type: array
-                items:
-                  type: string
-            example:
-              name: Escort Name
-              email: escort@example.com
-              password: secret
-              mobile: +1234567890
-              dob: 1990-01-01
-              bio: Escort Bio
-              price: 100
-              city: Escort City
-              state: Escort State
-              pincode: 123456
-              address: Escort Address
-              services: ["Service1", "Service2"]
-              files: ["file1.jpg", "file2.jpg"]
-      responses:
-        201:
-          description: Escort created successfully
-        400:
-          description: Email or mobile already exists
-        500:
-          description: Something went wrong
-
-  /get-escorts:
-    get:
-      summary: Get a list of escorts
-      tags:
-        - Escort
-      produces:
-        - application/json
-      parameters:
-        - name: city
-          in: query
-          type: string
-        - name: state
-          in: query
-          type: string
-        - name: age
-          in: query
-          type: number
-        - name: name
-          in: query
-          type: string
-      responses:
-        200:
-          description: List of escorts retrieved successfully
-        500:
-          description: Failed to fetch escorts
-
-  /get-escort-by-id/{id}:
-    get:
-      summary: Get escort by ID
-      tags:
-        - Escort
-      produces:
-        - application/json
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: string
-      responses:
-        200:
-          description: Escort details retrieved successfully
-        404:
-          description: Escort not found
-        500:
-          description: Something went wrong
-
-  /get-my-escorts:
-    get:
-      summary: Get my escorts (Vendor only)
-      tags:
-        - Escort
-      security:
-        - BearerAuth: []
-      produces:
-        - application/json
-      parameters:
-        - name: city
-          in: query
-          type: string
-        - name: state
-          in: query
-          type: string
-        - name: age
-          in: query
-          type: number
-        - name: name
-          in: query
-          type: string
-      responses:
-        200:
-          description: List of my escorts retrieved successfully
-        500:
-          description: Failed to fetch escorts
-
-  /update-escorts/{id}:
-    put:
-      summary: Update escort by ID
-      tags:
-        - Escort
-      security:
-        - BearerAuth: []
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: string
-        - name: body
-          in: body
-          required: true
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-              email:
-                type: string
-              mobile:
-                type: string
-              dob:
-                type: string
-              bio:
-                type: string
-              price:
-                type: number
-              city:
-                type: string
-              state:
-                type: string
-              pincode:
-                type: string
-              address:
-                type: string
-              services:
-                type: array
-                items:
-                  type: string
-              removeFiles:
-                type: array
-                items:
-                  type: string
-              files:
-                type: array
-                items:
-                  type: string
-            example:
-              name: Updated Escort Name
-              email: updated@example.com
-              mobile: +9876543210
-              dob: 1990-02-02
-              bio: Updated Escort Bio
-              price: 200
-              city: Updated Escort City
-              state: Updated Escort State
-              pincode: 654321
-              address: Updated Escort Address
-              services: ["Service1", "Service3"]
-              removeFiles: ["file1.jpg"]
-              files: ["file3.jpg"]
-      responses:
-        200:
-          description: Escort updated successfully
-        400:
-          description: Email or mobile already exists for another escort
-        404:
-          description: Escort not found
-        500:
-          description: Failed to update escort
-
-  /delete-escort/{id}:
-    delete:
-      summary: Delete an escort by ID
-      tags:
-        - Escort
-      security:
-        - BearerAuth: []
-      produces:
-        - application/json
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: string
-      responses:
-        200:
-          description: Escort deleted successfully
-        404:
-          description: Escort not found
-        500:
-          description: Something went wrong
 
   /create-advertisement:
     post:
@@ -1037,12 +793,12 @@ paths:
           schema:
             type: object
             properties:
-              vendorId:
+              userId:
                 type: string
               commissionPercentage:
                 type: number
             example:
-              vendorId: vendor123
+              userId: vendor123
               commissionPercentage: 10
       responses:
         200:
@@ -1067,7 +823,7 @@ paths:
         500:
           description: Failed to fetch vendor commissions
 
-  /get-commission-by-vendor/{id}:
+  /get-commission-by-escort/{id}:
     get:
       summary: Get commission by vendor ID
       tags:
@@ -1105,14 +861,14 @@ paths:
           schema:
             type: object
             properties:
-              escortId:
+              userId:
                 type: string
               rating:
                 type: number
               comment:
                 type: string
             example:
-              escortId: escort123
+              userId: escort123
               rating: 5
               comment: Excellent service
       responses:
@@ -1143,14 +899,14 @@ paths:
           schema:
             type: object
             properties:
-              escortId:
+              userId:
                 type: string
               rating:
                 type: number
               comment:
                 type: string
             example:
-              escortId: escort123
+              userId: escort123
               rating: 4
               comment: Good service
       responses:
@@ -1301,6 +1057,157 @@ paths:
           description: Service not found
         500:
           description: Failed to delete service
+
+  /book-escort:
+    post:
+      summary: Book an escort
+      tags:
+        - Booking
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              userId:
+                type: string
+                description: ID of the escort being booked
+              serviceId:
+                type: string
+                description: ID of the service being booked
+              bookingDate:
+                type: string
+                format: date
+                description: Date of the booking (YYYY-MM-DD)
+              bookingTime:
+                type: string
+                format: time
+                description: Time of the booking (HH:MM)
+              bookingHrs:
+                type: number
+                description: Duration of the booking in hours
+            example:
+              userId: 12345
+              serviceId: 67890
+              bookingDate: "2023-09-15"
+              bookingTime: "10:00"
+              bookingHrs: 2
+      responses:
+        201:
+          description: Escort booked successfully
+        400:
+          description: Bad request, escort already booked at the selected date and time
+        500:
+          description: Failed to book escort
+
+  /get-all-booking:
+    get:
+      summary: Get a list of all bookings
+      tags:
+        - Booking
+      security:
+        - BearerAuth: []
+      produces:
+        - application/json
+      responses:
+        200:
+          description: List of all bookings retrieved successfully
+        500:
+          description: Failed to fetch bookings
+
+  /get-booking-by-id/{id}:
+    get:
+      summary: Get a booking by ID
+      tags:
+        - Booking
+      security:
+        - BearerAuth: []
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Booking retrieved successfully
+        404:
+          description: Booking not found
+        500:
+          description: Failed to fetch booking
+
+  /get-booking-by-escort:
+    get:
+      summary: Get bookings for an escort
+      tags:
+        - Booking
+      security:
+        - BearerAuth: []
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Bookings for the escort retrieved successfully
+        500:
+          description: Failed to fetch bookings
+
+  /get-booking-by-customer:
+    get:
+      summary: Get bookings for a customer
+      tags:
+        - Booking
+      security:
+        - BearerAuth: []
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Bookings for the customer retrieved successfully
+        500:
+          description: Failed to fetch bookings
+
+  /update-booking-status/{id}:
+    put:
+      summary: Update booking status by ID
+      tags:
+        - Booking
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                description: New status for the booking
+            example:
+              status: "accepted"
+      responses:
+        200:
+          description: Booking status updated successfully
+        404:
+          description: Booking not found
+        500:
+          description: Failed to update booking status
 
 securityDefinitions:
   BearerAuth:

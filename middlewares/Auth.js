@@ -47,12 +47,12 @@ exports.isAdmin = (req,res,next) => {
     }
 }
 
-exports.isVendor = (req,res,next) => {
+exports.isEscort = (req,res,next) => {
     try{
-        if(req.user.role !== "Vendor") {
+        if(req.user.role !== "Escort") {
             return res.status(405).json({
                 success:false,
-                message:'This is a protected route for vendor',
+                message:'This is a protected route for escort',
             });
         }
         next();

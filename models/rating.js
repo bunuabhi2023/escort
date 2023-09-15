@@ -7,9 +7,9 @@ const ratings = new mongoose.Schema(
             ref: 'Customer',
             required: true,
         },
-        escortId: {
+        UserId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Escort',
+            ref: 'User',
             required: true,
         },
         rating:{

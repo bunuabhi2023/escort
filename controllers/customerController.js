@@ -1,5 +1,5 @@
 const Customer = require ('../models/customer');
-const Escort = require('../models/escort');
+const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { options } = require("../routes/route");
@@ -309,7 +309,7 @@ exports.getMyFavorite = async(req, res) =>{
 
     const wishlistDetails = await Promise.all(customer.favorites.map(async (wishlistItem) => {
       console.log(wishlistItem._id);
-      const escort = await Escort.findById(wishlistItem._id)
+      const escort = await User.findById(wishlistItem._id)
         .populate('serviceIds', 'name')
         .exec();
     
@@ -333,15 +333,15 @@ exports.addTofavorite = async (req, res) => {
     const authenticatedUser = req.customer;
 
     const customerId = authenticatedUser._id;
-    const {escortId } = req.body; 
+    const {userId } = req.body; 
 
     const customer = await Customer.findById(customerId);
     if (!customer) {
       return res.status(404).json({ message: 'Customer not found' });
     }
 
-    if (!customer.favorites.includes(escortId)) {
-      customer.favorites.push(escortId);
+    if (!customer.favorites.includes(userId)) {
+      customer.favorites.push(userId);
       await customer.save();
     }
 
@@ -357,14 +357,14 @@ exports.removeFromFavorite = async (req, res) => {
     const authenticatedUser = req.customer;
 
     const customerId = authenticatedUser._id;
-    const { escortId } = req.body;
+    const { userId } = req.body;
 
     const customer = await Customer.findById(customerId);
     if (!customer) {
       return res.status(404).json({ message: 'Customer not found' });
     }
 
-    const productIndex = customer.favorites.indexOf(escortId);
+    const productIndex = customer.favorites.indexOf(userId);
     if (productIndex !== -1) {
       customer.favorites.splice(productIndex, 1); // Remove the product from the wishlist array
       await customer.save();
@@ -384,7 +384,7 @@ exports.updateRecentlyViewedEscorts = async(req, res) => {
     const authenticatedUser = req.customer;
 
     const customerId = authenticatedUser._id;
-    const escortId =req.params.id;
+    const userId =req.params.id;
     // Find the customer by their ID
     const customer = await Customer.findById(customerId);
 
@@ -393,8 +393,8 @@ exports.updateRecentlyViewedEscorts = async(req, res) => {
     }
 
     // Add the escort to the recently viewed list
-    if (!customer.recentlyViewedEscorts.includes(escortId)) {
-      customer.recentlyViewedEscorts.unshift(escortId);
+    if (!customer.recentlyViewedEscorts.includes(userId)) {
+      customer.recentlyViewedEscorts.unshift(userId);
 
       // Limit the recently viewed list to a certain number (e.g., 10)
       if (customer.recentlyViewedEscorts.length > 10) {
@@ -427,7 +427,7 @@ exports.getMyRecentView =  async(req, res) =>{
     const recentlyViewedEscortIds = customer.recentlyViewedEscorts;
 
     // Use the $in operator to fetch all escort documents by their IDs
-    const recentlyViewedEscorts = await Escort.find({
+    const recentlyViewedEscorts = await User.find({
       _id: { $in: recentlyViewedEscortIds },
     }).populate('serviceIds', 'name').exec();
 

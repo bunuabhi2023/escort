@@ -87,13 +87,13 @@ const customers = new mongoose.Schema(
         },
         favorites: [{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Escort',
+            ref: 'User',
             required: false,
         }],
         recentlyViewedEscorts: [
             {
               type: mongoose.Schema.Types.ObjectId,
-              ref: 'Escort',
+              ref: 'User',
             },
         ],
         createdAt:{

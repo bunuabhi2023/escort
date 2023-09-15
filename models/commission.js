@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const commission = new mongoose.Schema(
     {
-        vendorId:{
+        userId:{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             required:false,

@@ -4,14 +4,15 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const customerController = require('../controllers/customerController');
 const advertisementController = require('../controllers/advertisementController');
-const escortController =  require('../controllers/escortController');
 const serviceController = require('../controllers/serviceController');
 const ratingController = require('../controllers/ratingController');
 const commissionController = require('../controllers/commissionController');
+const bookingController = require('../controllers/bookingController');
 
 
 
-const {auth, isAdmin, isVendor}  = require('../middlewares/Auth');
+
+const {auth, isAdmin, isEscort}  = require('../middlewares/Auth');
 
 const {customerAuth} = require('../middlewares/CustomerAuth');
 const { imageSingleUpload , imageMultiUpload} = require("../middlewares/multer");
@@ -23,10 +24,11 @@ router.get("/", (req, res) =>{
 router.post("/register-user", userController.signUp);
 router.post("/login-user", userController.login);
 router.get("/my-profile", auth, userController.getMyProfile);//auth
-router.put("/update-user/:id",imageSingleUpload, auth, userController.updateUser);
+router.put("/update-user/:id",imageMultiUpload, auth, userController.updateUser);
+router.put("/update-my-profile",imageMultiUpload, auth, userController.updateMyProfile);
 router.put("/update-user-status", auth, isAdmin, userController.updateUserStatus);
-router.get("/get-all-users", auth, isAdmin, userController.getUser);
-router.get("/get-user-by-id/:id", auth, isAdmin, userController.getUserById);
+router.get("/get-all-users", userController.getUser);
+router.get("/get-user-by-id/:id",  userController.getUserById);
 router.delete("/delete-user/:id", auth, isAdmin, userController.deleteUser);
 router.post("/forget-password",  userController.forgotPassword);
 router.post("/change-password", auth, userController.updatePassword);
@@ -46,6 +48,14 @@ router.post('/update-customer/:id', auth, isAdmin, customerController.updateCust
 router.put('/update-recent-view/:id', customerAuth, customerController.updateRecentlyViewedEscorts);
 router.get('/get-recent-view', customerAuth, customerController.getMyRecentView);
 
+//Booking Routes//
+router.post("/book-escort", customerAuth,bookingController.bookEscort);
+router.get("/get-all-booking", auth, isAdmin, bookingController.getAllBooking);
+router.get("/get-booking-by-id/:id",  bookingController.getBookingById);
+router.get("/get-booking-by-escort", auth, isEscort, bookingController.getEscortBooking);
+router.get("/get-booking-by-customer", customerAuth, bookingController.getBookingByCustomer);
+router.put("/update-booking-status/:id", auth, isEscort, bookingController.updateBookingStatus);
+
 
 
 //Advertisement  Route//
@@ -55,14 +65,6 @@ router.put("/update-advertisement-status/:id", auth, isAdmin, advertisementContr
 router.get("/get-advertisement",  advertisementController.getAllAdvertisement);
 router.get("/get-advertisement-by-id/:id",  advertisementController.getAdvertisementById);
 router.delete('/delete-advertisement/:id', auth, isAdmin, advertisementController.deleteAdvertisement);
-
-//Escort Route//
-router.post("/create-escort", imageMultiUpload, auth, isVendor, escortController.createEscort);
-router.get("/get-escorts",  escortController.getAllEscorts);
-router.get("/get-escort-by-id/:id",  escortController.getEscortById);
-router.get("/get-my-escorts",  auth, isVendor, escortController.getMyEscorts);
-router.put("/update-escorts/:id",  imageMultiUpload, auth,  escortController.updateEscort);
-router.delete("/delete-escort/:id",  auth, isVendor, escortController.deleteEscorts);
 
 
 //Service Route//
@@ -80,6 +82,6 @@ router.get("/get-rating/:id",  ratingController.getEscortRating);
 //Commission Route//
 router.post("/set-commission", auth, isAdmin, commissionController.setCommission);
 router.get('/get-all-commission', auth, isAdmin, commissionController.getAllCommission);
-router.get("/get-commission-by-vendor/:id", auth, isAdmin,  commissionController.getCommissionByVendor);
+router.get("/get-commission-by-escort/:id", auth, isAdmin,  commissionController.getCommissionByEscort);
 
 module.exports = router;

@@ -4,12 +4,12 @@ exports.creatRating = async(req, res) =>{
     const authenticatedUser = req.customer;
 
     const customerId = authenticatedUser._id;
-    const {escortId, rating, comment} =req.body;
+    const {userId, rating, comment} =req.body;
 
     try {
         const newRating = new Rating({
             customerId,
-            escortId,
+            userId,
             rating,
             comment,
           });
@@ -28,9 +28,9 @@ exports.creatRating = async(req, res) =>{
 exports.updateRating = async(req, res) =>{
     const ratingId = req.params.id;
     try {
-        const {escortId, rating, comment} = req.body;
+        const {userId, rating, comment} = req.body;
 
-        const esxitingRating = await Rating.findOne({_id:ratingId, escortId:escortId});
+        const esxitingRating = await Rating.findOne({_id:ratingId, userId:userId});
 
         if(!esxitingRating){
             return res.status(404).json({ message: 'Not Found' });
@@ -49,8 +49,8 @@ exports.updateRating = async(req, res) =>{
 
 exports.getEscortRating = async(req, res) =>{
     try {
-        const escortId = req.params.id;
-        const ratings = await Rating.find({escortId:escortId}).populate('customerId', 'name').populate('escortId', 'name').exec();
+        const userId = req.params.id;
+        const ratings = await Rating.find({userId:userId}).populate('customerId', 'name').populate('userId', 'name').exec();
 
         if(!ratings){
             return null;

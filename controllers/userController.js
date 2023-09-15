@@ -1,5 +1,5 @@
 const User = require("../models/user");
-const Escort = require('../models/escort');
+const Rating = require('../models/rating');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
@@ -167,8 +167,26 @@ exports.getMyProfile = async (req, res) => {
 
 exports.getUser = async (req, res) => {
   try {
+    const filters = {};
+    filters.role = 'Escort';
+    //filters.status = 'active';
+    if (req.query.city) {
+      filters.city = { $regex:req.query.city, $options: 'i' };
+    }
 
-    const users = await User.find({role: 'Vendor'});
+    if (req.query.state) {
+      filters.state = { $regex:req.query.state, $options: 'i' };
+    }
+
+    if (req.query.age) {
+      filters.age = req.query.age;
+    }
+
+    if (req.query.name) {
+      filters.name = { $regex: req.query.name, $options: 'i' }; // Case-insensitive name search
+    }
+
+    const users = await User.find(filters).select('-password').populate('serviceIds', 'name').lean();
 
     if (!users) {
       return res.status(404).json({ message: 'User not found' });
@@ -189,9 +207,10 @@ exports.getUserById = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+    const ratings = await Rating.find({userId:user._id}).populate('customerId', 'name');
   
-    const escorts = await Escort.find({vendorId:req.params.id});
-    return res.json({ user, escorts});
+    return res.json({ user,ratings});
   } catch (error) {
     console.error('Error fetching user:', error);
     return res.status(500).json({ message: 'Something went wrong' });
@@ -200,11 +219,14 @@ exports.getUserById = async (req, res) => {
 
 exports.updateUser = async(req,res) =>{
  
-    const { name, email, mobile, dob, city, state, pincode,address, status} = req.body;
-    const updatedBy = req.user.id;
+    const authenticatedUser = req.user;
 
-    const file = req.s3FileUrl;
+    const userId = authenticatedUser._id;
+    const { name, email, mobile, dob, city, state, pincode,address, bio, price, serviceIds} = req.body;
+    const updatedBy = userId;
 
+    const files = req.s3FileUrls;
+console.log(files);
     try {
       const existingUser = await User.findById(req.params.id);
 
@@ -239,7 +261,7 @@ exports.updateUser = async(req,res) =>{
 
       const updatedUser = await User.findByIdAndUpdate(
         req.params.id,
-        { name, email, mobile, age, dob, file, city, state, pincode,address, status, updatedBy, updatedAt: Date.now() },
+        { name, email, mobile, age, dob, bio, price, serviceIds,files, city, state, pincode,address, updatedBy, updatedAt: Date.now() },
         { new: true }
       );
 
@@ -249,6 +271,62 @@ exports.updateUser = async(req,res) =>{
       console.error(error); // Add this line for debug logging
       return res.status(500).json({ error: 'Failed to update User' });
     }
+};
+
+exports.updateMyProfile = async(req,res) =>{
+ 
+  const authenticatedUser = req.user;
+
+  const userId = authenticatedUser._id;
+  const { name, email, mobile, dob, city, state, pincode,address, bio, price, serviceIds} = req.body;
+  const updatedBy = userId;
+
+  const files = req.s3FileUrls;
+console.log(files);
+  try {
+    const existingUser = await User.findById(userId);
+
+    if (!existingUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    
+    const duplicateUser = await User.findOne({
+      $and: [
+        { _id: { $ne: existingUser._id } }, 
+        { $or: [{ email }, { mobile }] }, 
+      ],
+    });
+
+    if (duplicateUser) {
+      return res.status(400).json({ error: 'Email or mobile already exists for another user' });
+    }
+    // Calculate age based on dob and current date
+    const birthDate = new Date(dob);
+    const currentDate = new Date();
+    let age = currentDate.getFullYear() - birthDate.getFullYear();
+
+    // Check if the birthday has already occurred this year
+    if (
+      currentDate.getMonth() < birthDate.getMonth() ||
+      (currentDate.getMonth() === birthDate.getMonth() &&
+        currentDate.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { name, email, mobile, age, dob, bio, price, serviceIds,files, city, state, pincode,address, updatedBy, updatedAt: Date.now() },
+      { new: true }
+    );
+
+    console.log(updatedUser); // Add this line for debug logging
+    res.json(updatedUser);
+  } catch (error) {
+    console.error(error); // Add this line for debug logging
+    return res.status(500).json({ error: 'Failed to update User' });
+  }
 };
 
 exports.deleteUser = async (req, res) => {

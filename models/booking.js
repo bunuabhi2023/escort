@@ -2,19 +2,14 @@ const mongoose = require("mongoose");
 
 const bookings = new mongoose.Schema(
     {
-        escortId:{
+        userId:{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Escort',
+            ref: 'User',
             required:true,
         },
         customerId:{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Customer',
-            required:true,
-        },
-        vendorId:{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
             required:true,
         },
         serviceId:{
@@ -27,18 +22,8 @@ const bookings = new mongoose.Schema(
             required:false,
         },
         bookingTime:{
-            type: Date,
-            required: true,
-            get: (val) => {
-              // This getter function extracts the time portion and returns it as a string
-              return val ? val.toTimeString().slice(0, 8) : val;
-            },
-            set: (val) => {
-              // This setter function sets the Date object to the beginning of the day
-              // and then sets the time based on the provided string (HH:MM:SS)
-              const timeParts = val.split(':');
-              return new Date(0, 0, 0, timeParts[0], timeParts[1], timeParts[2]);
-            },
+            type:String,
+            required:false,   
         },
         bookingHrs:{
             
@@ -54,22 +39,7 @@ const bookings = new mongoose.Schema(
         amount:{
             type:String,
             required:false,
-        },      
-        razorpayPaymentId: {
-            type:String,
-            required:false,
-            maxLength:255,
-        },
-        razorpayOrderId: {
-            type:String,
-            required:false,
-            maxLength:255,
-        },
-        razorpaySignature: {
-            type:String,
-            required:false,
-            maxLength:255,
-        },
+        },  
         createdAt:{
             type:Date,
             required:true,

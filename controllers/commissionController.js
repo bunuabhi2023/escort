@@ -2,9 +2,9 @@ const Commission = require('../models/commission');
 
 exports.setCommission = async(req, res) =>{
     try {
-        const {vendorId, commissionPercentage} = req.body;
+        const {userId, commissionPercentage} = req.body;
 
-        const commission = await Commission.findOne({vendorId:vendorId});
+        const commission = await Commission.findOne({userId:userId});
         if(commission){
             commission.commissionPercentage = commissionPercentage;
             commission.save();
@@ -12,7 +12,7 @@ exports.setCommission = async(req, res) =>{
         }
 
         const newCommission = new Commission({
-            vendorId,
+            userId,
             commissionPercentage
         })
 
@@ -29,7 +29,7 @@ exports.setCommission = async(req, res) =>{
 
 exports.getAllCommission = async(req, res) =>{
     try {
-        const commissions = await Commission.find().populate('vendorId', 'name').exec();
+        const commissions = await Commission.find().populate('userId', 'name').exec();
         if(!commissions){
             return null;
         }
@@ -39,10 +39,10 @@ exports.getAllCommission = async(req, res) =>{
     }
 };
 
-exports.getCommissionByVendor = async(req, res) =>{
+exports.getCommissionByEscort = async(req, res) =>{
     try {
-        const vendorId = req.params.id;
-        const commission = await Commission.findOne({vendorId:vendorId}).populate('vendorId', 'name').exec();
+        const userId = req.params.id;
+        const commission = await Commission.findOne({userId:userId}).populate('userId', 'name').exec();
         if(!commission){
             return null;
         }
