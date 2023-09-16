@@ -167,6 +167,8 @@ exports.getMyProfile = async (req, res) => {
 
 exports.getUser = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
     const filters = {};
     filters.role = 'Escort';
     //filters.status = 'active';
@@ -186,13 +188,23 @@ exports.getUser = async (req, res) => {
       filters.name = { $regex: req.query.name, $options: 'i' }; // Case-insensitive name search
     }
 
-    const users = await User.find(filters).select('-password').populate('serviceIds', 'name').lean();
+    const users = await User.find(filters)
+      .select('-password')
+      .populate('serviceIds', 'name')
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .lean();
 
     if (!users) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    return res.json({ users });
+    const usersWithRatings = await Promise.all(users.map(async (user) => {
+      const ratings = await Rating.find({ userId: user._id });
+      return { ...user, ratings };
+    }));
+
+    return res.json({ users: usersWithRatings });
   } catch (error) {
     console.error('Error fetching user:', error);
     return res.status(500).json({ message: 'Something went wrong' });

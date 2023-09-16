@@ -47,6 +47,8 @@ router.post("/remove-from-favorite",  customerAuth, customerController.removeFro
 router.post('/update-customer/:id', auth, isAdmin, customerController.updateCustomer);
 router.put('/update-recent-view/:id', customerAuth, customerController.updateRecentlyViewedEscorts);
 router.get('/get-recent-view', customerAuth, customerController.getMyRecentView);
+router.post("/forget-customer-password",  customerController.forgotCustomerPassword);
+router.post("/change-customer-password", customerAuth, customerController.updateCustomerPassword);
 
 //Booking Routes//
 router.post("/book-escort", customerAuth,bookingController.bookEscort);

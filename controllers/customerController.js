@@ -235,12 +235,6 @@ exports.getCustomerById = async (req, res) => {
 };
 
 exports.updateCustomer = async(req,res) =>{
-  upload(req, res, async (err) => {
-    if (err instanceof multer.MulterError) {
-      return res.status(400).json({ error: 'Error uploading image' });
-    } else if (err) {
-      return res.status(500).json({ error: 'Server error' });
-    }
 
     const { name, email, mobile, dob, username } = req.body;
     const updatedBy = req.user.id;
@@ -292,8 +286,8 @@ exports.updateCustomer = async(req,res) =>{
       console.error(error); // Add this line for debug logging
       return res.status(500).json({ error: 'Failed to update Customer' });
     }
-  });
-}
+};
+
 
 exports.getMyFavorite = async(req, res) =>{
   try {
@@ -437,4 +431,69 @@ exports.getMyRecentView =  async(req, res) =>{
     console.error('Error getting recently viewed escorts:', error);
     throw error;
   }
-}
+};
+
+exports.forgotCustomerPassword = async (req, res) => {
+  const { email, newPassword, confirmPassword } = req.body;
+
+  try {
+    const customer = await Customer.findOne({ email:email });
+
+    if (!customer) {
+      return res.status(404).json({ message: 'customer not found' });
+    }
+
+    if(newPassword != confirmPassword){
+      return res.status(400).json({ message: 'New Password and Confirm Password is mismatch' });
+    }
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+    customer.password = hashedPassword;
+    customer.save();
+
+    return res.status(200).json({ message: 'Password Reset Successfully' });
+  } catch (error) {
+    console.error('Error during password reset:', error);
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+
+exports.updateCustomerPassword = async (req, res) => {
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+  const authenticatedUser = req.customer;
+
+  const customerId = authenticatedUser._id; // Assuming you have user information in req.user
+
+  try {
+    // Find the user by ID
+    const customer = await Customer.findById(customerId);
+
+    if (!customer) {
+      return res.status(404).json({ message: 'Uscustomerer not found' });
+    }
+
+    // Verify the old password
+    const isPasswordValid = await bcrypt.compare(oldPassword, customer.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Incorrect old password' });
+    }
+
+    // Validate the new password and confirmation
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: 'Passwords do not match' });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the password in the user document
+    customer.password = hashedPassword;
+    await customer.save();
+
+    return res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Error during password update:', error);
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+};
