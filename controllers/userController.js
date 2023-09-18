@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const Rating = require('../models/rating');
+const Booking = require('../models/booking');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
@@ -171,7 +172,7 @@ exports.getUser = async (req, res) => {
     const pageSize = parseInt(req.query.pageSize) || 10;
     const filters = {};
     filters.role = 'Escort';
-    //filters.status = 'active';
+    filters.status = 'active';
     if (req.query.city) {
       filters.city = { $regex:req.query.city, $options: 'i' };
     }
@@ -201,7 +202,8 @@ exports.getUser = async (req, res) => {
 
     const usersWithRatings = await Promise.all(users.map(async (user) => {
       const ratings = await Rating.find({ userId: user._id });
-      return { ...user, ratings };
+      const bookings = await Booking.find({userId:user._id, bookingStatus:"accepted"})
+      return { ...user, ratings, bookings };
     }));
 
     return res.json({ users: usersWithRatings });
@@ -290,11 +292,11 @@ exports.updateMyProfile = async(req,res) =>{
   const authenticatedUser = req.user;
 
   const userId = authenticatedUser._id;
-  const { name, email, mobile, dob, city, state, pincode,address, bio, price, serviceIds} = req.body;
+  const { name, email, mobile, dob, city, state, pincode,address, bio, price} = req.body;
   const updatedBy = userId;
 
-  const files = req.s3FileUrls;
-console.log(files);
+//   const files = req.s3FileUrls;
+// console.log(files);
   try {
     const existingUser = await User.findById(userId);
 
@@ -329,7 +331,7 @@ console.log(files);
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { name, email, mobile, age, dob, bio, price, serviceIds,files, city, state, pincode,address, updatedBy, updatedAt: Date.now() },
+      { name, email, mobile, age, dob, bio, price, city, state, pincode,address, updatedBy, updatedAt: Date.now() },
       { new: true }
     );
 
@@ -340,6 +342,79 @@ console.log(files);
     return res.status(500).json({ error: 'Failed to update User' });
   }
 };
+
+exports.updateMyGallery = async (req, res) => {
+  const authenticatedUser = req.user;
+  const userId = authenticatedUser._id;
+  const { removeFiles } = req.body; // IDs of files to be removed
+  const files = req.s3FileUrls; // Newly uploaded files
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Remove files with the specified IDs
+    if (removeFiles && removeFiles.length > 0) {
+      user.files = user.files.filter(file => !removeFiles.includes(file._id.toString()));
+    }
+
+    // Add newly uploaded files
+    if (files && files.length > 0) {
+      user.files.push(...files);
+    }
+
+    const updatedUser = await user.save();
+
+    return res.json(updatedUser);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to update files for the user' });
+  }
+};
+
+exports.updateUserServices = async (req, res) => {
+  const authenticatedUser = req.user;
+  const userId = authenticatedUser._id;
+  const { addServiceIds, removeServiceIds } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Add new service IDs if they don't already exist
+    if (addServiceIds && addServiceIds.length > 0) {
+      addServiceIds.forEach(serviceId => {
+        if (!user.serviceIds.includes(serviceId)) {
+          user.serviceIds.push(serviceId);
+        }
+      });
+    }
+
+    // Remove service IDs
+    // if (removeServiceIds && removeServiceIds.length > 0) {
+    //   user.serviceIds = user.serviceIds.filter(serviceId => !removeServiceIds.includes(serviceId));
+    // }
+    const stringRemoveServiceIds = removeServiceIds.map(id => id.toString());
+    user.serviceIds = user.serviceIds.filter(serviceId => !stringRemoveServiceIds.includes(serviceId.toString()));
+
+    const updatedUser = await user.save();
+
+    return res.json(updatedUser);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to update serviceIds for the user' });
+  }
+};
+
+
+
+
 
 exports.deleteUser = async (req, res) => {
   try {

@@ -12,6 +12,7 @@ app.use(
     cors({
         origin: [
             "http://localhost:3000",
+            "https://es-eta.vercel.app",
           ],
           credentials: true,
     })

@@ -25,7 +25,9 @@ router.post("/register-user", userController.signUp);
 router.post("/login-user", userController.login);
 router.get("/my-profile", auth, userController.getMyProfile);//auth
 router.put("/update-user/:id",imageMultiUpload, auth, userController.updateUser);
-router.put("/update-my-profile",imageMultiUpload, auth, userController.updateMyProfile);
+router.put("/update-my-profile", auth, userController.updateMyProfile);
+router.put("/update-my-gallery",imageMultiUpload, auth, userController.updateMyGallery);
+router.put("/update-my-services", auth, userController.updateUserServices);
 router.put("/update-user-status", auth, isAdmin, userController.updateUserStatus);
 router.get("/get-all-users", userController.getUser);
 router.get("/get-user-by-id/:id",  userController.getUserById);
@@ -38,7 +40,7 @@ router.post("/change-password", auth, userController.updatePassword);
 router.post("/register-customer", customerController.signup);
 router.post("/login-customer", customerController.login);
 router.get("/get-my-profile", customerAuth, customerController.getMyProfile);
-router.put("/update-my-profile", imageSingleUpload, customerAuth, customerController.updateMyProfile);
+router.put("/update-cust-profile",imageSingleUpload, customerAuth, customerController.updateMyProfile);
 router.get("/get-customer",  auth, isAdmin, customerController.getAllCustomers);
 router.get('/get-customer-by-id/:id', auth, isAdmin, customerController.getCustomerById);
 router.get("/get-my-favorite",  customerAuth, customerController.getMyFavorite);
@@ -70,11 +72,11 @@ router.delete('/delete-advertisement/:id', auth, isAdmin, advertisementControlle
 
 
 //Service Route//
-router.post("/create-service", auth, serviceController.createService);
-router.put('/update-service/:id', auth,  serviceController.updateService);
+router.post("/create-service", auth, isAdmin, serviceController.createService);
+router.put('/update-service/:id', auth,isAdmin, serviceController.updateService);
 router.get("/get-service",  serviceController.getAllService);
 router.get('/get-service-by-id/:id', serviceController.getServiceById);
-router.delete('/delete-service/:id', auth, serviceController.deleteService);
+router.delete('/delete-service/:id', auth, isAdmin, serviceController.deleteService);
 
 //Rating Route//
 router.post("/create-rating", customerAuth, ratingController.creatRating);

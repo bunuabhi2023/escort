@@ -11,11 +11,39 @@ exports.bookEscort = async(req, res) =>{
         const escort = await User.findById(userId);
 
         const price = escort.price;
+        const [hrs, minutes] = bookingHrs.split(':').map(Number);
 
-        const existingBooking =  await Booking.findOne({userId:userId, bookingDate: bookingDate, bookingTime:bookingTime, bookingStatus:"accepted"});
+        const bookingHrsDecimal = hrs + (minutes / 60);
+
+        // Calculate total price
+        const totalPrice = price * bookingHrsDecimal;
+
+        const currentDate = new Date();
+        const requestedBookingDate = new Date(bookingDate);
+
+        // Check if bookingDate is in the past
+        if (requestedBookingDate < currentDate) {
+            return res.status(400).json({ message: 'Booking date cannot be in the past.' });
+        }
+        const bookingEndTime = addBookingHrsToTime(bookingTime, bookingHrs);
+
+        const existingBooking =  await Booking.findOne({userId:userId, bookingDate: bookingDate, bookingTime: { $gte: bookingTime, $lte: bookingEndTime }, bookingStatus:"accepted"});
 
         if(existingBooking){  
             return res.status(400).json({ message: 'This Escort is Already Booked At Selected Date and Time. Please Choose diffrent time slot to get service!' });
+        }
+        const myexistingBooking = await Booking.findOne({
+            userId: userId,
+            bookingDate: bookingDate,
+            bookingTime: { $gte: bookingTime, $lte: bookingEndTime },
+            $or: [
+                { bookingStatus: "pending" },
+                { bookingStatus: "accepted" }
+            ],
+            customerId: customerId
+        });
+        if(myexistingBooking){  
+            return res.status(400).json({ message: 'You Have Already booked This Escort For Given Slot!' });
         }
         const newbooking = new Booking({
             userId,
@@ -24,7 +52,7 @@ exports.bookEscort = async(req, res) =>{
             bookingDate,
             bookingTime,
             bookingHrs,
-            amount : price,
+            amount : totalPrice,
         });
 
         await newbooking.save();
@@ -96,7 +124,7 @@ exports.getBookingByCustomer = async(req, res) =>{
 
         const customerId = authenticatedUser._id;
 
-        const booking = await Booking.find({customerId:customerId}).populate('userId', 'name').populate('serviceId', 'name').exec();
+        const booking = await Booking.find({customerId:customerId}).populate('userId','-password').populate('serviceId', 'name').exec();
         if(!booking){ 
             return res.status(404).json({ message: 'No data Found' });
 
@@ -130,4 +158,20 @@ exports.updateBookingStatus = async(req, res) =>{
         return res.status(500).json({ error: 'Failed to Update Status' });
     }
     
+};
+
+function addBookingHrsToTime(bookingTime, bookingHrs) {
+    const [bookingTimeHours, bookingTimeMinutes] = bookingTime.split(':').map(Number);
+    const [bookingHrsHours, bookingHrsMinutes] = bookingHrs.split(':').map(Number);
+
+    let totalHours = bookingTimeHours + bookingHrsHours;
+    let totalMinutes = bookingTimeMinutes + bookingHrsMinutes;
+
+    // Adjust hours and minutes
+    if (totalMinutes >= 60) {
+        totalHours += Math.floor(totalMinutes / 60);
+        totalMinutes %= 60;
+    }
+
+    return `${String(totalHours).padStart(2, '0')}:${String(totalMinutes).padStart(2, '0')}`;
 }

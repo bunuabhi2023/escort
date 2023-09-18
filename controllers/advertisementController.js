@@ -5,7 +5,7 @@ const createAdvertisement = async (req, res) => {
     const createdBy = req.user.id;
     const file = req.s3FileUrl;
 
-    newAdvertisement = new Advertisement({
+   const newAdvertisement = new Advertisement({
     title,
     file,
     createdBy,

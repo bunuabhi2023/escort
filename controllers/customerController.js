@@ -154,7 +154,8 @@ exports.updateMyProfile = async(req, res) =>{
         const { name, email, mobile, dob, username } = req.body;
         const updatedBy = req.customer.id;
     
-        const file = req.s3FileUrl;
+       
+    const file = req.s3FileUrl;
     
         try {
           const existingCustomer = await Customer.findById(customerId);
