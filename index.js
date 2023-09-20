@@ -31,7 +31,7 @@ app.use(cookieParser());
 const route = require("./routes/route");
 
 //mount the todo API routes
-app.use("/api/v1", route);
+app.use("/backend/api/v1", route);
 
 module.exports.handler = sls(app);
 
@@ -40,7 +40,7 @@ app.listen(PORT, () =>{
     console.log(`Server started Successfully at ${PORT}`);
 })
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/backend/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 //connect to the database
 const dbConnect = require("./config/database");
 dbConnect();
