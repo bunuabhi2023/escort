@@ -30,7 +30,7 @@ app.use(cookieParser());
 const route = require("./routes/route");
 
 //mount the todo API routes
-app.use("/api/v1", route);
+app.use("/api/v1/backend", route);
 
 module.exports.handler = sls(app);
 
