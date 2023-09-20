@@ -227,6 +227,7 @@ exports.getUserForAdmin = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    
     const usersWithRatings = await Promise.all(users.map(async (user) => {
       const ratings = await Rating.find({ userId: user._id });
       const bookings = await Booking.find({userId:user._id, bookingStatus:"accepted"})
