@@ -213,6 +213,31 @@ exports.getUser = async (req, res) => {
   }
 };
 
+exports.getUserForAdmin = async (req, res) => {
+  try {
+    
+    const users = await User.find()
+      .select('-password')
+      .populate('serviceIds', 'name')
+      .lean();
+
+    if (!users) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const usersWithRatings = await Promise.all(users.map(async (user) => {
+      const ratings = await Rating.find({ userId: user._id });
+      const bookings = await Booking.find({userId:user._id, bookingStatus:"accepted"})
+      return { ...user, ratings, bookings };
+    }));
+
+    return res.json({ users: usersWithRatings });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+
 exports.getUserById = async (req, res) => {
   try {
 

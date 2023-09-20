@@ -25,8 +25,6 @@ const updateAdvertisement = async (req, res) => {
   
     const { title} = req.body;
     const updatedBy = req.user.id;
-    let updateFields = null
-    if(req.body.file && file.length>0){
       const file = req.s3FileUrl;
       updateFields = {
         title,
@@ -34,14 +32,7 @@ const updateAdvertisement = async (req, res) => {
         updatedBy,
         updatedAt: Date.now(),
       };
-    }else{
-      updateFields = {
-        title,
-        updatedBy,
-        updatedAt: Date.now(),
-      };
-    }
-
+    
 
     try {
       const updatedAdvertisement = await Advertisement.findByIdAndUpdate(
@@ -65,6 +56,20 @@ const updateAdvertisement = async (req, res) => {
 
 // Function to get all Advertisement
 const getAllAdvertisement = async (req, res)  => {
+  try {
+    const advertisements = await Advertisement.find({status:'Publish'})
+      .populate('createdBy', 'name')
+      .populate('updatedBy', 'name')
+      .exec();
+      
+        res.json(advertisements);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to fetch discounts' });
+  }
+};
+
+const getAllAdvertisementForAdmin = async (req, res)  => {
   try {
     const advertisements = await Advertisement.find()
       .populate('createdBy', 'name')
@@ -141,5 +146,6 @@ module.exports = {
     getAllAdvertisement,
     getAdvertisementById,
     deleteAdvertisement,
-    changeStatus
+    changeStatus,
+    getAllAdvertisementForAdmin
   };
