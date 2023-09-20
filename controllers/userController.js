@@ -217,6 +217,8 @@ exports.getUserForAdmin = async (req, res) => {
   try {
     
     const users = await User.find()
+      .where('role')
+      .ne('Admin')
       .select('-password')
       .populate('serviceIds', 'name')
       .lean();
@@ -261,11 +263,11 @@ exports.updateUser = async(req,res) =>{
     const authenticatedUser = req.user;
 
     const userId = authenticatedUser._id;
-    const { name, email, mobile, dob, city, state, pincode,address, bio, price, serviceIds} = req.body;
+    const { name, email, mobile, dob, city, state, pincode,address, bio, price, serviceIds, removeFiles} = req.body;
     const updatedBy = userId;
 
     const files = req.s3FileUrls;
-console.log(files);
+    console.log(files);
     try {
       const existingUser = await User.findById(req.params.id);
 
@@ -298,12 +300,32 @@ console.log(files);
         age--;
       }
 
-      const updatedUser = await User.findByIdAndUpdate(
-        req.params.id,
-        { name, email, mobile, age, dob, bio, price, serviceIds,files, city, state, pincode,address, updatedBy, updatedAt: Date.now() },
-        { new: true }
-      );
+      const user = await User.findById(req.params.id);
+       user.name = name;
+       user.email = email;
+       user.mobile = mobile;
+       user.dob = dob;
+       user.age = age;
+       user.bio = bio;
+       user.price = price;
+       user.serviceIds = serviceIds;
+       user.city = city;
+       user.state =state;
+       user.pincode =pincode;
+       user.address = address;
+       user.updatedBy = updatedBy;
+       user.updatedAt = Date.now()
+       // Remove files with the specified IDs
+      if (removeFiles && removeFiles.length > 0) {
+        user.files = user.files.filter(file => !removeFiles.includes(file._id.toString()));
+      }
 
+      // Add newly uploaded files
+      if (files && files.length > 0) {
+        user.files.push(...files);
+      }
+
+      const updatedUser = await user.save();
       console.log(updatedUser); // Add this line for debug logging
       res.json(updatedUser);
     } catch (error) {
