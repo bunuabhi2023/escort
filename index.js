@@ -39,7 +39,7 @@ app.listen(PORT, () =>{
     console.log(`Server started Successfully at ${PORT}`);
 })
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/backend/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 //connect to the database
 const dbConnect = require("./config/database");
 dbConnect();
