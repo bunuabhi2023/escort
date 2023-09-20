@@ -7,7 +7,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./config/swagger-config'); // Path to your swaggerConfig.js file
 
 const cors = require('cors');
-app.use('/uploads', express.static('uploads'));
+app.use('/backend/uploads', express.static('uploads'));
 app.use(
     cors({
         origin: [
@@ -31,7 +31,7 @@ app.use(cookieParser());
 const route = require("./routes/route");
 
 //mount the todo API routes
-app.use("/api/v1/backend", route);
+app.use("/backend/api/v1", route);
 
 module.exports.handler = sls(app);
 
