@@ -30,6 +30,7 @@ router.put("/update-my-gallery",imageMultiUpload, auth, userController.updateMyG
 router.put("/update-my-services", auth, userController.updateUserServices);
 router.put("/update-user-status", auth, isAdmin, userController.updateUserStatus);
 router.get("/get-all-users", userController.getUser);
+router.get("/get-all-users-for-admin", auth, isAdmin, userController.getUserForAdmin);
 router.get("/get-user-by-id/:id",  userController.getUserById);
 router.delete("/delete-user/:id", auth, isAdmin, userController.deleteUser);
 router.post("/forget-password",  userController.forgotPassword);
@@ -67,6 +68,7 @@ router.post("/create-advertisement",imageSingleUpload, auth, isAdmin,advertiseme
 router.put("/update-advertisement/:id",imageSingleUpload, auth, isAdmin, advertisementController.updateAdvertisement);
 router.put("/update-advertisement-status/:id", auth, isAdmin, advertisementController.changeStatus);
 router.get("/get-advertisement",  advertisementController.getAllAdvertisement);
+router.get("/get-advertisement-for-admin", auth, isAdmin,  advertisementController.getAllAdvertisementForAdmin);
 router.get("/get-advertisement-by-id/:id",  advertisementController.getAdvertisementById);
 router.delete('/delete-advertisement/:id', auth, isAdmin, advertisementController.deleteAdvertisement);
 
