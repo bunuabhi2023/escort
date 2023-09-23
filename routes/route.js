@@ -47,7 +47,7 @@ router.get('/get-customer-by-id/:id', auth, isAdmin, customerController.getCusto
 router.get("/get-my-favorite",  customerAuth, customerController.getMyFavorite);
 router.post("/add-to-favorite",  customerAuth, customerController.addTofavorite);
 router.post("/remove-from-favorite",  customerAuth, customerController.removeFromFavorite);
-router.post('/update-customer/:id', auth, isAdmin, customerController.updateCustomer);
+router.put('/update-customer/:id', imageSingleUpload,auth, isAdmin, customerController.updateCustomer);
 router.put('/update-recent-view/:id', customerAuth, customerController.updateRecentlyViewedEscorts);
 router.get('/get-recent-view', customerAuth, customerController.getMyRecentView);
 router.post("/forget-customer-password",  customerController.forgotCustomerPassword);
