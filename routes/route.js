@@ -8,6 +8,7 @@ const serviceController = require('../controllers/serviceController');
 const ratingController = require('../controllers/ratingController');
 const commissionController = require('../controllers/commissionController');
 const bookingController = require('../controllers/bookingController');
+const escortDashboardController =require('../controllers/escortDashboardController');
 
 
 
@@ -89,5 +90,10 @@ router.get("/get-rating/:id",  ratingController.getEscortRating);
 router.post("/set-commission", auth, isAdmin, commissionController.setCommission);
 router.get('/get-all-commission', auth, isAdmin, commissionController.getAllCommission);
 router.get("/get-commission-by-escort/:id", auth, isAdmin,  commissionController.getCommissionByEscort);
+
+//Escort Dashboard Route//
+router.get("/get-today-booking-for-escort", auth, escortDashboardController.getTotalBookingsTodayForUser);
+router.get("/get-this-week-booking-for-escort", auth, escortDashboardController.getTotalBookingsThisWeekForUser);
+router.get("/get-this-month-booking-for-escort", auth, escortDashboardController.getTotalBookingsThisMonthForUser);
 
 module.exports = router;
