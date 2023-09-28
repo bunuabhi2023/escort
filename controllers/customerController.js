@@ -197,7 +197,7 @@ exports.updateMyProfile = async(req, res) =>{
           );
     
           console.log(updatedCustomer); // Add this line for debug logging
-          res.json(updatedCustomer);
+          res.json({customer:updatedCustomer});
         } catch (error) {
           console.error(error); // Add this line for debug logging
           return res.status(500).json({ error: 'Failed to update Customer' });
