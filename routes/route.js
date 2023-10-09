@@ -9,6 +9,7 @@ const ratingController = require('../controllers/ratingController');
 const commissionController = require('../controllers/commissionController');
 const bookingController = require('../controllers/bookingController');
 const escortDashboardController =require('../controllers/escortDashboardController');
+const dashboardController = require('../controllers/dashboardController');
 
 
 
@@ -95,5 +96,9 @@ router.get("/get-commission-by-escort/:id", auth, isAdmin,  commissionController
 router.get("/get-today-booking-for-escort", auth, escortDashboardController.getTotalBookingsTodayForUser);
 router.get("/get-this-week-booking-for-escort", auth, escortDashboardController.getTotalBookingsThisWeekForUser);
 router.get("/get-this-month-booking-for-escort", auth, escortDashboardController.getTotalBookingsThisMonthForUser);
+
+//Dashboard Route//
+router.get("/get-dashboard-data", auth, isAdmin,dashboardController.dashBoardData );
+router.get("/get-month-wise-booking", auth, isAdmin,dashboardController.getMonthlyBookingCounts );
 
 module.exports = router;
