@@ -25,6 +25,7 @@ router.get("/", (req, res) =>{
 //Admin Route//
 router.post("/register-user", userController.signUp);
 router.post("/login-user", userController.login);
+router.post("/login-escort", userController.loginEscort);
 router.get("/my-profile", auth, userController.getMyProfile);//auth
 router.put("/update-user/:id",imageMultiUpload, auth, userController.updateUser);
 router.put("/update-my-profile", auth, userController.updateMyProfile);
@@ -36,6 +37,7 @@ router.get("/get-all-users-for-admin", auth, isAdmin, userController.getUserForA
 router.get("/get-user-by-id/:id",  userController.getUserById);
 router.delete("/delete-user/:id", auth, isAdmin, userController.deleteUser);
 router.post("/forget-password",  userController.forgotPassword);
+router.post("/reset-password",  userController.resetPassword);
 router.post("/change-password", auth, userController.updatePassword);
 
 
@@ -76,8 +78,8 @@ router.delete('/delete-advertisement/:id', auth, isAdmin, advertisementControlle
 
 
 //Service Route//
-router.post("/create-service", auth, isAdmin, serviceController.createService);
-router.put('/update-service/:id', auth,isAdmin, serviceController.updateService);
+router.post("/create-service", imageSingleUpload, auth, isAdmin, serviceController.createService);
+router.put('/update-service/:id', imageSingleUpload, auth,isAdmin, serviceController.updateService);
 router.get("/get-service",  serviceController.getAllService);
 router.get('/get-service-by-id/:id', serviceController.getServiceById);
 router.delete('/delete-service/:id', auth, isAdmin, serviceController.deleteService);
